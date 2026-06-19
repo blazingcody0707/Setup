@@ -23,4 +23,17 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
 
+# Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: sudo apt update && sudo apt upgrade -y && sudo apt install git wget flex bison build-essential \
+            libx11-dev:i386 libfreetype-dev:i386 libwine-dev:i386 \
+            libssl-dev:i386 libxml2-dev:i386 libxslt1-dev:i386 \
+            libgl-dev:i386 libosmesa-dev:i386 libsdl2-dev:i386 \
+            libudev-dev:i386 libgstreamer1.0-dev:i386 \
+            libasound2-dev:i386 libpulse-dev:i386 libudev-dev:i386 \
+            libvkd3d-dev:i386 libvulkan-dev:i386 mingw-w64
+
+# Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: wget 
       
