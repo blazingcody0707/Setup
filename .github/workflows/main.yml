@@ -20,14 +20,9 @@ jobs:
           # Creates a flawless Ubuntu 26.04 Resolute rootfs directory tree natively matching ports paths
           sudo mmdebstrap --variant=minbase resolute ./rootfs "http://ports.ubuntu.com/"
 
-      - name: Compress Directory for XoDos Import
-        run: |
-          # Elevates privileges with sudo to read protected files like /etc/shadow cleanly
-          sudo tar -cf xodos-ubuntu-26.04.tar.xz -C ./rootfs .
-
-      - name: Upload Distribution Artifact Package
+      - name: Upload Raw Directory Tree for XoDos Import
         uses: actions/upload-artifact@v4
         with:
-          name: xodos-ready-ubuntu-rootfs
-          path: ./xodos-ubuntu-26.04.tar.xz
-          compression-level: 0 # Bypasses redundant re-compression passes since xz handles it
+          name: xodos-uncompressed-rootfs-tree
+          path: ./rootfs
+          include-hidden-files: true # Guarantees that essential system files like .asoundrc are preserved
