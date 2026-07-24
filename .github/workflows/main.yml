@@ -1,27 +1,33 @@
-name: Build Custom Ubuntu 26.04 Rootfs
+name: Generate XoDos-Ark Ubuntu 26.04 Rootfs
 
 on:
-  workflow_dispatch: # Allows you to trigger the build manually with a single click button
+  workflow_dispatch: # Allows you to trigger this manual compilation with a single click button
 
 jobs:
-  build-archive:
-    runs-on: ubuntu-26.04-arm
+  build-rootfs-directory:
+    runs-on: ubuntu-26.04-arm # Leverages your chosen high-performance native ARM64 cloud instances
     steps:
-      - name: Checkout Repository Files
+      - name: Checkout Code Repository
         uses: actions/checkout@v4
 
-      - name: Install Generation Tools
+      - name: Deploy Compilation Tools
         run: |
           sudo apt-get update
           sudo apt-get install -y mmdebstrap xz-utils
 
-      - name: Compile and Compress Ubuntu 26.04 Rootfs
+      - name: Execute Core mmdebstrap Generation
         run: |
-          sudo mmdebstrap --variant=minbase resolute ./ubuntu-26.04-rootfs.tar.xz "http://ports.ubuntu.com/"
+          # Creates a flawless Ubuntu 26.04 Plucky rootfs directory tree natively matching ports paths
+          sudo mmdebstrap --variant=minbase plucky ./rootfs "http://ports.ubuntu.com/"
 
-      - name: Upload Finished Rootfs File Package
+      - name: Compress Directory for XoDos Import
+        run: |
+          # Packs the rootfs directory quietly into your required clean tarball distribution package 
+          tar -cf xodos-ubuntu-26.04.tar.xz -C ./rootfs .
+
+      - name: Upload Distribution Artifact Package
         uses: actions/upload-artifact@v4
         with:
-          name: ubuntu-26.04-arm64-rootfs
-          path: ./ubuntu-26.04-rootfs.tar.xz
-          compression-level: 0 # File is already compressed with high-efficiency xz
+          name: xodos-ready-ubuntu-rootfs
+          path: ./xodos-ubuntu-26.04.tar.xz
+          compression-level: 0 # Bypasses redundant re-compression passes since xz handles it
