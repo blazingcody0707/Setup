@@ -17,7 +17,7 @@ jobs:
 
       - name: Compile and Compress Ubuntu 26.04 Rootfs
         run: |
-          sudo mmdebstrap --variant=minbase plucky ./ubuntu-26.04-rootfs.tar.xz "http://ports.ubuntu.com"
+          sudo mmdebstrap --variant=minbase resolute ./ubuntu-26.04-rootfs.tar.xz "http://ports.ubuntu.com/"
 
       - name: Upload Finished Rootfs File Package
         uses: actions/upload-artifact@v4
