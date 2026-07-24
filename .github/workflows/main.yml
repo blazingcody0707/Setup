@@ -17,12 +17,12 @@ jobs:
 
       - name: Execute Core mmdebstrap Generation
         run: |
-          # Creates a flawless Ubuntu 26.04 Plucky rootfs directory tree natively matching ports paths
-          sudo mmdebstrap --variant=minbase plucky ./rootfs "http://ports.ubuntu.com/"
+          # Creates a flawless Ubuntu 26.04 Resolute rootfs directory tree natively matching ports paths
+          sudo mmdebstrap --variant=minbase resolute ./rootfs "http://ports.ubuntu.com/"
 
-            - name: Compress Directory for XoDos Import
-             run: |
-          # Packs the rootfs directory quietly into your required clean tarball distribution package 
+      - name: Compress Directory for XoDos Import
+        run: |
+          # Elevates privileges with sudo to read protected files like /etc/shadow cleanly
           sudo tar -cf xodos-ubuntu-26.04.tar.xz -C ./rootfs .
 
       - name: Upload Distribution Artifact Package
