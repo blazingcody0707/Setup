@@ -1,28 +1,37 @@
-name: Generate XoDos-Ark Ubuntu 26.04 Rootfs
+name: Convert Flatpak Bundle into Universal Rootless Tarball
 
 on:
-  workflow_dispatch: # Allows you to trigger this manual compilation with a single click button
+  workflow_dispatch: # Allows you to manually trigger this build anytime via the GitHub web interface!
 
 jobs:
-  build-rootfs-directory:
-    runs-on: ubuntu-26.04-arm # Leverages your chosen high-performance native ARM64 cloud instances
+  convert_flatpak:
+    name: Run Cloud Extraction Loop
+    runs-on: ubuntu-24.04-arm
+
     steps:
-      - name: Checkout Code Repository
+      - name: Checkout Repository Context
         uses: actions/checkout@v4
 
-      - name: Deploy Compilation Tools
+      - name: Convert Flatpak Bundle into Universal Rootless Tarball
         run: |
-          sudo apt-get update
-          sudo apt-get install -y mmdebstrap xz-utils
-
-      - name: Execute Core mmdebstrap Generation
-        run: |
-          # Creates a flawless Ubuntu 26.04 Resolute rootfs directory tree natively matching ports paths
-          sudo mmdebstrap --variant=minbase resolute ./rootfs "http://ports.ubuntu.com/"
-
-      - name: Upload Raw Directory Tree for XoDos Import
+          # 1. Install desktop-grade ostree utility tools onto the cloud runner
+          sudo apt-get update && sudo apt-get install -y ostree
+          
+          # 2. Initialize a genuine bare repository database layout on the server
+          ostree --repo=./cloud_repo init --mode=bare-user
+          
+          # 3. Pull down the official 18.32MB package bundle straight to the cloud disk
+          wget -q https://dl.dolphin-emu.org/releases/2606/dolphin-2606-aarch64.flatpak
+          
+          # 4. Import the static delta blocks and force checkout the pure user-space files
+          ostree --repo=./cloud_repo static-delta apply-offline ./dolphin-2606-aarch64.flatpak
+          ostree --repo=./cloud_repo checkout -U a6d8d35e7a8e999d4964f2490eb023e45a9d7f7d6593f980378bb6c2efb485fc ./dolphin_extracted
+          
+          # 5. Pack the pristine emulator filesystem straight into a standard compressed TAR package!
+          tar -czf dolphin_files.tar.gz -C ./dolphin_extracted/files/ .
+          
+      - name: Upload Clean Emulator Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: xodos-uncompressed-rootfs-tree
-          path: ./rootfs
-          include-hidden-files: true # Guarantees that essential system files like .asoundrc are preserved
+          name: dolphin-native-arm64
+          path: dolphin_files.tar.gz
